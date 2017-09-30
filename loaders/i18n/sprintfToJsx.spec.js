@@ -97,4 +97,19 @@ assert.strictEqual(
   '() => <span/>'
 );
 
-console.log('All tests pass');
+assert.strictEqual(
+  sprintfToJsx('hello\nworld'),
+  '() => \'hello\\nworld\''
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span attr"></span>'),
+  '() => <span/>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span x-y="z"></span>'),
+  '() => <span x-y="z"/>'
+);
+
+console.log('All test pass');

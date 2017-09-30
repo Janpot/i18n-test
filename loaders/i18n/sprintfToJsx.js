@@ -1,5 +1,6 @@
 const parse5 = require('parse5');
 const treeAdapter = parse5.treeAdapters.default;
+const jsStringEscape = require('js-string-escape');
 
 let i =0;
 
@@ -67,7 +68,7 @@ function serializeAttributeValueToJsx (value, context) {
             if (node.value === '') {
               return null;
             } else {
-              return `'${node.value.replace(/'/, '\\\'')}'`;
+              return `'${jsStringEscape(node.value)}'`;
             }
           case 'variable':
             context.params.add(node.name);
@@ -94,7 +95,10 @@ function serializeOpeningTagToJsx (node, context, key = null, selfClosing = fals
   const alreadyHasKey = attributes.some(({name}) => name === 'key');
   const openingTagContent = [
     tagName,
-    ...attributes.map(attribute => serializeAttributeToJsx(attribute, context)),
+    ...attributes
+      // TODO: figure out how JSX maps attribute
+      .filter(({name}) => /^[a-zA-Z0-9-]*$/.test(name))
+      .map(attribute => serializeAttributeToJsx(attribute, context)),
     ...(key && !alreadyHasKey ? [`key="${key}"`] : [])
   ].join(' ');
   return `<${openingTagContent}${selfClosing ? '/' : ''}>`;
@@ -128,7 +132,7 @@ function serializeTextFragment (node, context, keyBase) {
   return parseSprintf(textContent)
     .map((node, i) => {
       switch (node.type) {
-        case 'text': return `'${node.value.replace(/'/g, '\\\'')}'`;
+        case 'text': return `'${jsStringEscape(node.value)}'`;
         case 'variable':
           context.params.add(node.name);
           const key = `${keyBase}-${i}`;
