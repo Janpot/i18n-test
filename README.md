@@ -2,8 +2,10 @@
 
 Precompiles our message formats (sprintf) to react components.
 Use webpack aliasing to create multiple bundles for each locale.
+Renders fragments which can be used in react 16. On lower version you'll need to set option `wrap: true` to make it wrap automatically in a `<span>`.
 
-##How it works:
+
+## How it works:
 
 a special loader for `client/locales/*.json` which transforms the contained tags to react compomnents.
 
@@ -30,7 +32,6 @@ import { I18n_interpolated_tag } from 'i18n';
 <I18n_interpolated_tag sub1="hello" sub2="world" />
 ```
 
-
 ### advantages:
 * Performant: no extra processing of messages when included in the markup
 * part of the bundle, so no extra requests required
@@ -41,6 +42,5 @@ import { I18n_interpolated_tag } from 'i18n';
 * Missing/invalid tags caught at compile time
 
 ### disadvantages:
-* Wraps translations with a `<span>` if not already wrapped in a html element. Can be fixed in react 16 with fragments
 * Ugly component names. We can make this naming configurable. But we're a bit limited by how tree shaking works. I wish something like `import { some_tag, some_other_tag } as I18n from 'i18n'` was possible.
 * need to rebuild when translations change in production

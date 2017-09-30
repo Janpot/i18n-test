@@ -25,7 +25,16 @@ module.exports = {
       {
         test: /\.json$/,
         include: path.resolve(__dirname, '../client/locales'),
-        use: [{ loader: 'babel-loader' }, { loader: 'i18n' }]
+        use: [
+          { loader: 'babel-loader' },
+          {
+            loader: 'i18n',
+            options: {
+              prefix: 'I18n_',
+              wrap: false
+            }
+          }
+        ]
       }
     ]
   },

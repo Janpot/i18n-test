@@ -2,22 +2,32 @@ const assert = require('assert');
 const sprintfToJsx = require('./sprintfToJsx');
 
 assert.strictEqual(
-  sprintfToJsx('Some random string'),
-  '() => <span>Some random string</span>'
+  sprintfToJsx('x'),
+  '() => \'x\''
 );
 
 assert.strictEqual(
-  sprintfToJsx('Here\'s some substitution: %(sub1)s, and another: %(sub2)s'),
-  '({sub1, sub2}) => <span>Here\'s some substitution: {sub1}, and another: {sub2}</span>'
+  sprintfToJsx('x', { wrap: true }),
+  '() => <span>x</span>'
 );
 
 assert.strictEqual(
-  sprintfToJsx('nested <i>markup</i>'),
-  '() => <span>nested <i>markup</i></span>'
+  sprintfToJsx('ab %(bc)s cd %(de)s ef', { wrap: true }),
+  '({bc, de}) => <span>ab {bc} cd {de} ef</span>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('a <i>b</i>', { wrap: true }),
+  '() => <span>a <i>b</i></span>'
 );
 
 assert.strictEqual(
   sprintfToJsx('<span>x</span>'),
+  '() => <span>x</span>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span>x</span>', { wrap: true }),
   '() => <span>x</span>'
 );
 
@@ -27,10 +37,16 @@ assert.strictEqual(
 );
 
 assert.strictEqual(
+  sprintfToJsx('<div>x</div>', { wrap: true }),
+  '() => <div>x</div>'
+);
+
+assert.strictEqual(
   sprintfToJsx('<span attr="x">y</span>'),
   '() => <span attr="x">y</span>'
 );
 
+// TODO; lookup jsx property translation rules
 assert.strictEqual(
   sprintfToJsx('<span class="x">y</span>'),
   '() => <span className="x">y</span>'
@@ -44,6 +60,31 @@ assert.strictEqual(
 assert.strictEqual(
   sprintfToJsx('<span attr="a %(b)s c"></span>'),
   '({b}) => <span attr={\'a \'+b+\' c\'}></span>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span>x</span>'),
+  '() => <span>x</span>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('a <span>b</span> c'),
+  '() => [\'a \',<span key="1">b</span>,\' c\']'
+);
+
+assert.strictEqual(
+  sprintfToJsx('a <span key="x">b</span> c'),
+  '() => [\'a \',<span key="x">b</span>,\' c\']'
+);
+
+assert.strictEqual(
+  sprintfToJsx('a %(b)s c'),
+  '({b}) => [\'a \',ensureKey(b,\'0-1\'),\' c\']'
+);
+
+assert.strictEqual(
+  sprintfToJsx(`'`),
+  '() => \'\\\'\''
 );
 
 console.log('All tests pass');

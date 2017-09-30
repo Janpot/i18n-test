@@ -1,6 +1,8 @@
 const parse5 = require('parse5');
 const treeAdapter = parse5.treeAdapters.default;
 
+let i =0;
+
 function parseSprintf (sprintfStr) {
   return sprintfStr
     .split(/%\(([a-zA-Z][a-zA-Z0-9]*)\)s/g)
@@ -86,12 +88,14 @@ function serializeAttributeToJsx ({ name, value }, context) {
   ].join('=');
 }
 
-function serializeOpeningTagToJsx (node, context) {
+function serializeOpeningTagToJsx (node, context, key) {
   const tagName = treeAdapter.getTagName(node);
   const attributes = treeAdapter.getAttrList(node);
+  const alreadyHasKey = attributes.some(({name}) => name === 'key');
   const openingTagContent = [
     tagName,
-    ...attributes.map(attribute => serializeAttributeToJsx(attribute, context))
+    ...attributes.map(attribute => serializeAttributeToJsx(attribute, context)),
+    ...(key && !alreadyHasKey ? [`key="${key}"`] : [])
   ].join(' ');
   return `<${openingTagContent}>`;
 }
@@ -101,31 +105,55 @@ function serializeClosingTagToJsx (node, context) {
   return `</${tagName}>`;
 }
 
-function serializeNodeToJsx (node, context) {
+function serializeNodeToJsx (node, context, key = null) {
   if (treeAdapter.isElementNode(node)) {
     return [
-      serializeOpeningTagToJsx(node, context),
+      serializeOpeningTagToJsx(node, context, key),
       serializeChildNodesToJsx(node, context),
       serializeClosingTagToJsx(node, context)
     ].join('');
   } else if (treeAdapter.isTextNode(node)) {
     const textContent = treeAdapter.getTextNodeContent(node);
     return serializeTextContentToJsx(textContent, context);
-  } else {
-    return serializeChildNodesToJsx(node, context);
   }
 }
 
-function serializeToJsx (node) {
+function serializeTextFragment (node, context, keyBase) {
+  const textContent = treeAdapter.getTextNodeContent(node);
+  return parseSprintf(textContent)
+    .map((node, i) => {
+      switch (node.type) {
+        case 'text': return `'${node.value.replace(/'/g, '\\\'')}'`;
+        case 'variable':
+          context.params.add(node.name);
+          const key = `${keyBase}-${i}`;
+          return `ensureKey(${node.name},'${key}')`;
+        default: throw new Error(`Unknown AST node type "${node.type}"`);
+      }
+    });
+}
+
+function serializeToJsx (ast) {
   const context = {
     params: new Set()
   };
-  const jsxBody = serializeNodeToJsx(node, context);
+
+  const fragmentValues = treeAdapter.getChildNodes(ast)
+    .reduce((fragmentValues, node, i, childNodes) => {
+      if (treeAdapter.isTextNode(node)) {
+        return fragmentValues.concat(serializeTextFragment(node, context, String(i)));
+      } else {
+        const key = childNodes.length > 1 ? String(i) : null;
+        return fragmentValues.concat([serializeNodeToJsx(node, context, key)]);
+      }
+    }, []);
   const paramsDecl = context.params.size > 0 ? `{${Array.from(context.params).join(', ')}}` : '';
+  const jsxBody = fragmentValues.length === 1 ? fragmentValues[0] : `[${fragmentValues.join(',')}]`;
   return `(${paramsDecl}) => ${jsxBody}`;
 }
 
-module.exports = function (sprintfStr) {
-  const ast = parse5.parseFragment(sprintfStr, { treeAdapter });
-  return serializeToJsx(ensureToplevelTag(ast));
+module.exports = function (sprintfStr, { wrap = false } = {}) {
+  const rawAst = parse5.parseFragment(sprintfStr, { treeAdapter });
+  const ast = wrap ? ensureToplevelTag(rawAst) : rawAst;
+  return serializeToJsx(ast);
 };
