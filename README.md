@@ -2,8 +2,7 @@
 
 Precompiles our message formats (sprintf) to react components.
 Use webpack aliasing to create multiple bundles for each locale.
-Renders fragments which can be used in react 16. On lower version you'll need to set option `wrap: true` to make it wrap automatically in a `<span>`.
-
+Renders fragments will be used in react 16. On lower version it will automatically wrap with a `<span>`
 
 ## How it works:
 
@@ -20,8 +19,16 @@ for instance:
 becomes:
 
 ```jsx
+// react < 16.0.0
 import React from 'react';
 export const I18n_interpolated_tag = ({sub1, sub2}) => <span>Here's some substitution: {sub1}, and another: {sub2}</span>;
+```
+
+```jsx
+// react >= 16.0.0
+import React from 'react';
+const ensureKey = (elm, key) => React.isValidElement(elm) ? React.cloneElement(elm,{key}) : elm;
+export const I18n_interpolated_tag = ({sub1, sub2}) => ['Here\'s some substitution: ',ensureKey(sub1,'0-1'),', and another: ',ensureKey(sub2,'0-3'),'']
 ```
 
 Using webpack aliases we can resolve the correct locale to a certain module identifier (`i18n`)

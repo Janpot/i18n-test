@@ -30,8 +30,7 @@ module.exports = {
           {
             loader: 'i18n',
             options: {
-              prefix: 'I18n_',
-              wrap: false
+              prefix: 'I18n_'
             }
           }
         ]

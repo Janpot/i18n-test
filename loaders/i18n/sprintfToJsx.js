@@ -45,8 +45,8 @@ function ensureToplevelTag (ast) {
   return ast;
 }
 
-function serializeChildNodesToJsx (node, context) {
-  return treeAdapter.getChildNodes(node)
+function serializeNodesToJsx (nodes, context) {
+  return nodes
     .map(node => serializeNodeToJsx(node, context))
     .join('');
 }
@@ -88,7 +88,7 @@ function serializeAttributeToJsx ({ name, value }, context) {
   ].join('=');
 }
 
-function serializeOpeningTagToJsx (node, context, key) {
+function serializeOpeningTagToJsx (node, context, key = null, selfClosing = false) {
   const tagName = treeAdapter.getTagName(node);
   const attributes = treeAdapter.getAttrList(node);
   const alreadyHasKey = attributes.some(({name}) => name === 'key');
@@ -97,7 +97,7 @@ function serializeOpeningTagToJsx (node, context, key) {
     ...attributes.map(attribute => serializeAttributeToJsx(attribute, context)),
     ...(key && !alreadyHasKey ? [`key="${key}"`] : [])
   ].join(' ');
-  return `<${openingTagContent}>`;
+  return `<${openingTagContent}${selfClosing ? '/' : ''}>`;
 }
 
 function serializeClosingTagToJsx (node, context) {
@@ -107,11 +107,16 @@ function serializeClosingTagToJsx (node, context) {
 
 function serializeNodeToJsx (node, context, key = null) {
   if (treeAdapter.isElementNode(node)) {
-    return [
-      serializeOpeningTagToJsx(node, context, key),
-      serializeChildNodesToJsx(node, context),
-      serializeClosingTagToJsx(node, context)
-    ].join('');
+    const childNodes = treeAdapter.getChildNodes(node);
+    if (childNodes.length <= 0) {
+      return serializeOpeningTagToJsx(node, context, key, true);
+    } else {
+      return [
+        serializeOpeningTagToJsx(node, context, key, false),
+        serializeNodesToJsx(childNodes, context),
+        serializeClosingTagToJsx(node, context)
+      ].join('');
+    }
   } else if (treeAdapter.isTextNode(node)) {
     const textContent = treeAdapter.getTextNodeContent(node);
     return serializeTextContentToJsx(textContent, context);

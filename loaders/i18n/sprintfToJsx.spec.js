@@ -59,7 +59,12 @@ assert.strictEqual(
 
 assert.strictEqual(
   sprintfToJsx('<span attr="a %(b)s c"></span>'),
-  '({b}) => <span attr={\'a \'+b+\' c\'}></span>'
+  '({b}) => <span attr={\'a \'+b+\' c\'}/>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span attr="a %(b)s c">x</span>'),
+  '({b}) => <span attr={\'a \'+b+\' c\'}>x</span>'
 );
 
 assert.strictEqual(
@@ -85,6 +90,11 @@ assert.strictEqual(
 assert.strictEqual(
   sprintfToJsx(`'`),
   '() => \'\\\'\''
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span></span>'),
+  '() => <span/>'
 );
 
 console.log('All tests pass');
