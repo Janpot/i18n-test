@@ -1,0 +1,6 @@
+{
+  "simple_tag": "Gewoon random tekst",
+  "interpolated_tag": "met een substitutie: %(sub1)s, en nog een: %(sub2)s",
+  "nested_markup": "geneste <i>opmaak</i>",
+  "link": "<a href=\"%(theHref)s\">%(theText)s</a>"
+}

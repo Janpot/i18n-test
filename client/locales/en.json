@@ -1,0 +1,6 @@
+{
+  "simple_tag": "Some random string",
+  "interpolated_tag": "Here's some substitution: %(sub1)s, and another: %(sub2)s",
+  "nested_markup": "nested <i>markup</i>",
+  "link": "<a href=\"%(theHref)s\">%(theText)s</a>"
+}
