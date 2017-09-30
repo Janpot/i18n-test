@@ -1,8 +1,7 @@
 # WooRank i18n experiment
 
-Precompiles our message formats (sprintf) to react components.
-Use webpack aliasing to create multiple bundles for each locale.
-Renders fragments will be used in react 16. On lower version it will automatically wrap with a `<span>`
+Precompiles our messages format (sprintf) to react components.
+Uses webpack aliases to create multiple bundles, one for each locale.
 
 ## How it works:
 
@@ -22,17 +21,17 @@ becomes:
 // react < 16.0.0
 import React from 'react';
 export const I18n_interpolated_tag = ({sub1, sub2}) => <span>Here's some substitution: {sub1}, and another: {sub2}</span>;
-```
 
-```jsx
 // react >= 16.0.0
 import React from 'react';
 const ensureKey = (elm, key) => React.isValidElement(elm) ? React.cloneElement(elm,{key}) : elm;
-export const I18n_interpolated_tag = ({sub1, sub2}) => ['Here\'s some substitution: ',ensureKey(sub1,'0-1'),', and another: ',ensureKey(sub2,'0-3'),'']
+export const I18n_interpolated_tag = ({sub1, sub2}) => ['Here\'s some substitution: ',ensureKey(sub1,'0-1'),', and another: ',ensureKey(sub2,'0-3')]
 ```
 
-Using webpack aliases we can resolve the correct locale to a certain module identifier (`i18n`)
-then use to this component, just do like any other:
+It renders fragments when used in react 16. On lower versions it will automatically wrap with a `<span>`
+
+Using webpack aliases we can resolve the correct locale to a certain module identifier (e.g. `i18n`)
+then, to use this component, just do like any other:
 
 ```
 import { I18n_interpolated_tag } from 'i18n';
@@ -49,5 +48,6 @@ import { I18n_interpolated_tag } from 'i18n';
 * Missing/invalid tags caught at compile time
 
 ### disadvantages:
+* very naive `sprinf` parser. It only recognozes `%(...)s` for now
 * Ugly component names. We can make this naming configurable. But we're a bit limited by how tree shaking works. I wish something like `import { some_tag, some_other_tag } as I18n from 'i18n'` was possible.
 * need to rebuild when translations change in production
