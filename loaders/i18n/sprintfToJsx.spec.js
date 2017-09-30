@@ -112,4 +112,9 @@ assert.strictEqual(
   '() => <span x-y="z"/>'
 );
 
+assert.strictEqual(
+  sprintfToJsx('%(a)s'),
+  '({a}) => ensureKey(a,\'0-0\')'
+);
+
 console.log('All test pass');

@@ -2,8 +2,6 @@ const parse5 = require('parse5');
 const treeAdapter = parse5.treeAdapters.default;
 const jsStringEscape = require('js-string-escape');
 
-let i =0;
-
 function parseSprintf (sprintfStr) {
   return sprintfStr
     .split(/%\(([a-zA-Z][a-zA-Z0-9]*)\)s/g)
@@ -15,7 +13,8 @@ function parseSprintf (sprintfStr) {
         type: 'variable',
         name: part
       };
-    });
+    })
+    .filter(({ type, value }) => (type === 'text' && value) || type !== 'text');
 }
 
 function serializeTextContentToJsx (content, context) {

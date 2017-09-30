@@ -17,8 +17,8 @@ module.exports = function (source) {
       if (isValidJsIdentifier(identifier)) {
         return `export const ${identifier} = ${sprintfToJsx(message, { wrap })}`;
       } else {
-        console.log(`Invalid id "${tag}"`);
-        return `// Invalid id "${tag}"`;
+        this.emitWarning(`Invalid message id "${tag}"`);
+        return `// Invalid message id "${tag}"`;
       }
     });
 

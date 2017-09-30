@@ -38,7 +38,10 @@ module.exports = {
       }
     ]
   },
-  plugins: [HtmlWebpackPluginConfig, new UglifyJSPlugin()],
+  plugins: [
+    // new UglifyJSPlugin(), enable for tree-shaking
+    HtmlWebpackPluginConfig
+  ],
   resolveLoader: {
     modules: ['node_modules', path.resolve(__dirname, '../loaders')]
   }
