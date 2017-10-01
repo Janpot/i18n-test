@@ -12,11 +12,11 @@ function createConfigForLocale (locale) {
 
   return merge(common, {
     output: {
-      path: path.resolve(__dirname, `../dist/${locale}`)
+      path: path.resolve(common.context, `./dist/${locale}`)
     },
     resolve: {
       alias: {
-        i18n: path.resolve(__dirname, `../client/locales/${locale}.json`)
+        i18n: path.resolve(common.context, `./client/locales/${locale}.json`)
       }
     },
     plugins: [

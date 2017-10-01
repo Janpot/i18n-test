@@ -1,16 +1,18 @@
 const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
+const context = path.resolve(__dirname, '..');
+
 module.exports = {
-  context: path.resolve(__dirname, '..'),
+  context,
   entry: './client/index.js',
   output: {
-    path: path.resolve(__dirname, '../dist/en'),
+    path: path.resolve(context, './dist/en'),
     filename: 'index_bundle.js'
   },
   resolve: {
     alias: {
-      i18n: path.resolve(__dirname, '../client/locales/en.json')
+      i18n: path.resolve(context, './client/locales/en.json')
     }
   },
   module: {
@@ -19,7 +21,7 @@ module.exports = {
       { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ },
       {
         test: /\.json$/,
-        include: path.resolve(__dirname, '../client/locales'),
+        include: path.resolve(context, './client/locales'),
         use: [ { loader: 'babel-loader' }, { loader: 'i18n' } ]
       }
     ]
@@ -28,6 +30,6 @@ module.exports = {
     // new UglifyJSPlugin(), // enable for tree-shaking
   ],
   resolveLoader: {
-    modules: ['node_modules', path.resolve(__dirname, '../loaders')]
+    modules: ['node_modules', path.resolve(context, './loaders')]
   }
 };
