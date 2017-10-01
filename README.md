@@ -79,6 +79,7 @@ To create a bundle for a specific locale:
 ```js
 const locale = 'en'
 {
+  // ...
   output: {
     path: path.resolve(__dirname, `../dist/${locale}`)
   },
@@ -92,7 +93,7 @@ const locale = 'en'
 
 ### tree shaking
 
-Turn of modules in `.babelrc`:
+Turn off modules in `.babelrc`:
 
 ```json
 {
