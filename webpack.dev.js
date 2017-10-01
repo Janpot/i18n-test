@@ -1,2 +1,3 @@
-const utils = require('./utils');
+const utils = require('./webpack/utils');
+
 module.exports = utils.createConfigForLocale('en');

@@ -1,11 +1,5 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
-  template: './client/index.html',
-  filename: 'index.html',
-  inject: 'body'
-});
 
 module.exports = {
   context: path.resolve(__dirname, '..'),
@@ -32,7 +26,6 @@ module.exports = {
   },
   plugins: [
     // new UglifyJSPlugin(), // enable for tree-shaking
-    HtmlWebpackPluginConfig
   ],
   resolveLoader: {
     modules: ['node_modules', path.resolve(__dirname, '../loaders')]

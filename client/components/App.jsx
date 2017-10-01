@@ -27,9 +27,6 @@ export default class App extends React.Component {
         <p>
           Use as function: {I18n.simple_tag()}
         </p>
-        <p>
-          <I18n.break_it a="y"/>
-        </p>
       </div>);
   }
 }

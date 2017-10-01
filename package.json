@@ -4,12 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server",
-    "start:en": "webpack-dev-server --config ./webpack/webpack.en.js",
-    "start:nl": "webpack-dev-server --config ./webpack/webpack.nl.js",
-    "build": "npm run build:en && npm run build:nl",
-    "build:en": "webpack --config ./webpack/webpack.en.js",
-    "build:nl": "webpack --config ./webpack/webpack.nl.js",
+    "start": "webpack-dev-server --config ./webpack.dev.js",
+    "build": "webpack",
     "watch:test": "nodemon ./loaders/i18n/sprintfToJsx.spec.js"
   },
   "dependencies": {
