@@ -8,7 +8,8 @@ const babelrc = {
   presets: [
     ['env', { modules: false }],
     'react'
-  ]
+  ],
+  cacheDirectory: true
 };
 
 module.exports = ({ production = false, locale = 'en' } = {}) => ({
