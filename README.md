@@ -33,7 +33,7 @@ It renders fragments when used in react 16. On lower versions it will automatica
 Using webpack aliases we can resolve the correct locale to a certain module identifier (e.g. `i18n`)
 then, to use this component, just do like any other:
 
-```
+```jsx
 import * as I18n from 'i18n';
 <I18n.interpolated_tag sub1="hello" sub2="world" />
 ```
