@@ -34,8 +34,9 @@ Using webpack aliases we can resolve the correct locale to a certain module iden
 then, to use this component, just do like any other:
 
 ```jsx
+import React from 'react';
 import * as I18n from 'i18n';
-class MyComponent {
+class MyComponent extends React.Component {
   render () {
     return (
       <div>
