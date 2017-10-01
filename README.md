@@ -3,6 +3,32 @@
 Precompiles our messages format (sprintf) to react components.
 Uses webpack aliases to create multiple bundles, one for each locale.
 
+## Commands:
+
+To run the dev server
+
+```sh
+npm start
+```
+
+To run the dev server in a specific locale
+
+```sh
+npm start -- --env.locale=nl
+```
+
+ To make a build:
+
+```sh
+npm run build
+```
+
+ To make a production build:
+
+```sh
+npm run build -- --env.production
+```
+
 ## How it works:
 
 a special loader for `client/locales/*.json` which transforms the contained tags to react components.
@@ -47,14 +73,16 @@ class MyComponent extends React.Component {
 }
 ```
 
-## project configuration
+## project configuration:
 
-### loader
+### loader:
 
 To enable the i18n loader on the locale files:
 
 ```js
-{
+// webpack.config.js
+const path = require('path');
+module.exports = {
   // ...
   module: {
     loaders: [
@@ -69,16 +97,17 @@ To enable the i18n loader on the locale files:
   resolveLoader: {
     modules: ['node_modules', path.resolve(__dirname, '../loaders')]
   }
-}
+};
 ```
 
-### localized bundles
+### localized bundles:
 
 To create a bundle for a specific locale:
 
 ```js
-const locale = 'en'
-{
+// webpack.config.js
+const path = require('path');
+module.exports = ({ locale = 'en' } = {}) => ({
   // ...
   output: {
     path: path.resolve(__dirname, `../dist/${locale}`)
@@ -88,10 +117,16 @@ const locale = 'en'
       i18n: path.resolve(__dirname, `../client/locales/${locale}.json`)
     }
   }
-}
+})
 ```
 
-### tree shaking
+Then it can be run as:
+
+```sh
+webpack --env.locale=nl
+```
+
+### tree shaking:
 
 Turn off modules in `.babelrc`:
 
@@ -104,13 +139,21 @@ Turn off modules in `.babelrc`:
 use `uglifyjs-webpack-plugin`:
 
 ```js
-{
+// webpack.config.js
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+module.exports = ({ production } = {}) => {
   // ...
-  plugins: [ new UglifyJSPlugin() ]
+  plugins: production ? [ new UglifyJSPlugin() ] : []
 }
 ```
 
-## Conclusion
+Then call webpack with
+
+```sh
+webpack --production
+```
+
+## Conclusion:
 
 ### advantages:
 * Performant: no extra processing of messages when included in the markup

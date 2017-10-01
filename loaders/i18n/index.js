@@ -25,6 +25,5 @@ module.exports = function (source) {
     tagComponents.join('\n')
   ].join('\n');
 
-  console.log(body);
   return body;
 };
