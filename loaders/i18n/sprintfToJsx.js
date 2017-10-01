@@ -43,7 +43,7 @@ function sprintfToJsxAttributeValue (sprintfStr, context) {
             if (node.value === '') {
               return null;
             } else {
-              return `'${node.value.replace(/'/, '\\\'')}'`;
+              return `'${jsStringEscape(node.value)}'`;
             }
           case 'variable':
             context.params.add(node.name);

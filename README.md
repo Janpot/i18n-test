@@ -5,7 +5,7 @@ Uses webpack aliases to create multiple bundles, one for each locale.
 
 ## How it works:
 
-a special loader for `client/locales/*.json` which transforms the contained tags to react compomnents.
+a special loader for `client/locales/*.json` which transforms the contained tags to react components.
 
 for instance:
 
@@ -123,6 +123,6 @@ use `uglifyjs-webpack-plugin`:
 * Since these are react components, it's possible to add extra behaviour to them for our translation tooling, like a debug mode, or maybe even live editing
 
 ### disadvantages:
-* Very naive `sprinf` parser. It only recognozes `%(...)s` for now
+* Very naive `sprinf` parser. It only recognizes `%(...)s` for now. But afaik that's the only thing we use.
 * Extra compile time, needs optimization
 * Need to rebuild when translations change in production

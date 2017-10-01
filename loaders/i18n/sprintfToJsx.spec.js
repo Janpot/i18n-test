@@ -46,10 +46,20 @@ assert.strictEqual(
   '() => <span attr="x">y</span>'
 );
 
-// TODO; lookup jsx property translation rules
+// TODO: lookup jsx property transformation rules
 assert.strictEqual(
   sprintfToJsx('<span class="x">y</span>'),
   '() => <span className="x">y</span>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span x="%(a)s\n">x</span>'),
+  '({a}) => <span x={a+\'\\n\'}>x</span>'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<span x="%(a)s&quot;">x</span>'),
+  `({a}) => <span x={a+'\\"'}>x</span>`
 );
 
 assert.strictEqual(
