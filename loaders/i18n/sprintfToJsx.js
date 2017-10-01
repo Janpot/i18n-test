@@ -67,7 +67,7 @@ function serializeAttributeValueToJsx (value, context) {
             if (node.value === '') {
               return null;
             } else {
-              return `'${jsStringEscape(node.value)}'`;
+              return `'${node.value.replace(/'/, '\\\'')}'`;
             }
           case 'variable':
             context.params.add(node.name);
@@ -123,6 +123,8 @@ function serializeNodeToJsx (node, context, key = null) {
   } else if (treeAdapter.isTextNode(node)) {
     const textContent = treeAdapter.getTextNodeContent(node);
     return serializeTextContentToJsx(textContent, context);
+  } else {
+    return null;
   }
 }
 
@@ -141,12 +143,22 @@ function serializeTextFragment (node, context, keyBase) {
     });
 }
 
+function jsxBodyFromFragments (fragments) {
+  if (fragments.length <= 0) {
+    return `null`;
+  } else if (fragments.length === 1) {
+    return fragments[0];
+  } else {
+    return `[${fragments.join(',')}]`;
+  }
+}
+
 function serializeToJsx (ast) {
   const context = {
     params: new Set()
   };
-
   const fragmentValues = treeAdapter.getChildNodes(ast)
+    .filter(node => !treeAdapter.isCommentNode(node))
     .reduce((fragmentValues, node, i, childNodes) => {
       if (treeAdapter.isTextNode(node)) {
         return fragmentValues.concat(serializeTextFragment(node, context, String(i)));
@@ -156,7 +168,7 @@ function serializeToJsx (ast) {
       }
     }, []);
   const paramsDecl = context.params.size > 0 ? `{${Array.from(context.params).join(', ')}}` : '';
-  const jsxBody = fragmentValues.length === 1 ? fragmentValues[0] : `[${fragmentValues.join(',')}]`;
+  const jsxBody = jsxBodyFromFragments(fragmentValues);
   return `(${paramsDecl}) => ${jsxBody}`;
 }
 

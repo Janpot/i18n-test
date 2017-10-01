@@ -103,6 +103,36 @@ assert.strictEqual(
 );
 
 assert.strictEqual(
+  sprintfToJsx('<span>hello\nworld</span>'),
+  '() => <span>hello\nworld</span>'
+);
+
+assert.strictEqual(
+  sprintfToJsx(''),
+  '() => null'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<!-- hello -->'),
+  '() => null'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<!-- hello --><!-- world -->'),
+  '() => null'
+);
+
+assert.strictEqual(
+  sprintfToJsx('<!-- hello -->x<!-- world -->'),
+  '() => \'x\''
+);
+
+assert.strictEqual(
+  sprintfToJsx('<!-- hello --><span>x</span><!-- world -->'),
+  '() => <span>x</span>'
+);
+
+assert.strictEqual(
   sprintfToJsx('<span attr"></span>'),
   '() => <span/>'
 );
