@@ -150,7 +150,7 @@ module.exports = ({ production } = {}) => {
 Then call webpack with
 
 ```sh
-webpack --production
+webpack --env.production
 ```
 
 ## Conclusion:
