@@ -47,6 +47,70 @@ class MyComponent extends React.Component {
 }
 ```
 
+## project configuration
+
+### loader
+
+To enable the i18n loader on the locale files:
+
+```js
+{
+  // ...
+  module: {
+    loaders: [
+      // ...
+      {
+        test: /\.json$/,
+        include: path.resolve(__dirname, '../client/locales'),
+        use: [ { loader: 'babel-loader' }, { loader: 'i18n' } ]
+      }
+    ]
+  },
+  resolveLoader: {
+    modules: ['node_modules', path.resolve(__dirname, '../loaders')]
+  }
+}
+```
+
+### localized bundles
+
+To create a bundle for a specific locale:
+
+```js
+const locale = 'en'
+{
+  output: {
+    path: path.resolve(__dirname, `../dist/${locale}`)
+  },
+  resolve: {
+    alias: {
+      i18n: path.resolve(__dirname, `../client/locales/${locale}.json`)
+    }
+  }
+}
+```
+
+### tree shaking
+
+Turn of modules in `.babelrc`:
+
+```json
+{
+    "presets":[ ["env", { "modules": false }], "react" ]
+}
+```
+
+use `uglifyjs-webpack-plugin`:
+
+```js
+{
+  // ...
+  plugins: [ new UglifyJSPlugin() ]
+}
+```
+
+## Conclusion
+
 ### advantages:
 * Performant: no extra processing of messages when included in the markup
 * part of the bundle, so no extra requests required
