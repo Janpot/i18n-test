@@ -20,12 +20,12 @@ becomes:
 ```jsx
 // react < 16.0.0
 import React from 'react';
-export const I18n_interpolated_tag = ({sub1, sub2}) => <span>Here's some substitution: {sub1}, and another: {sub2}</span>;
+export const interpolated_tag = ({sub1, sub2}) => <span>Here's some substitution: {sub1}, and another: {sub2}</span>;
 
 // react >= 16.0.0
 import React from 'react';
 const ensureKey = (elm, key) => React.isValidElement(elm) ? React.cloneElement(elm,{key}) : elm;
-export const I18n_interpolated_tag = ({sub1, sub2}) => ['Here\'s some substitution: ',ensureKey(sub1,'0-1'),', and another: ',ensureKey(sub2,'0-3')]
+export const interpolated_tag = ({sub1, sub2}) => ['Here\'s some substitution: ',ensureKey(sub1,'0-1'),', and another: ',ensureKey(sub2,'0-3')]
 ```
 
 It renders fragments when used in react 16. On lower versions it will automatically wrap with a `<span>`
@@ -34,8 +34,8 @@ Using webpack aliases we can resolve the correct locale to a certain module iden
 then, to use this component, just do like any other:
 
 ```
-import { I18n_interpolated_tag } from 'i18n';
-<I18n_interpolated_tag sub1="hello" sub2="world" />
+import * as I18n from 'i18n';
+<I18n.interpolated_tag sub1="hello" sub2="world" />
 ```
 
 ### advantages:
@@ -46,8 +46,9 @@ import { I18n_interpolated_tag } from 'i18n';
 * Supports interpolation of components
 * Safe: relies on react escaping
 * Missing/invalid tags caught at compile time
+* Since these are react components, it's possible to add extra behaviour to them for our translation tooling, like a debug mode, or maybe even live editing
 
 ### disadvantages:
-* very naive `sprinf` parser. It only recognozes `%(...)s` for now
-* Ugly component names. We can make this naming configurable. But we're a bit limited by how tree shaking works. I wish something like `import { some_tag, some_other_tag } as I18n from 'i18n'` was possible.
-* need to rebuild when translations change in production
+* Very naive `sprinf` parser. It only recognozes `%(...)s` for now
+* Extra compile time, needs optimization
+* Need to rebuild when translations change in production

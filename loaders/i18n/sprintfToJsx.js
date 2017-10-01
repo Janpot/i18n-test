@@ -17,8 +17,8 @@ function parseSprintf (sprintfStr) {
     .filter(({ type, value }) => (type === 'text' && value) || type !== 'text');
 }
 
-function serializeTextContentToJsx (content, context) {
-  return parseSprintf(content)
+function sprintfToJsxTextNode (sprintfStr, context) {
+  return parseSprintf(sprintfStr)
     .map(node => {
       switch (node.type) {
         case 'text': return node.value;
@@ -29,6 +29,46 @@ function serializeTextContentToJsx (content, context) {
       }
     })
     .join('');
+}
+
+function sprintfToJsxAttributeValue (sprintfStr, context) {
+  const sprintfAst = parseSprintf(sprintfStr);
+  if (sprintfAst.length === 1 && sprintfAst[0].type === 'text') {
+    return `"${sprintfAst[0].value}"`;
+  } else {
+    const attributeValueExpression = sprintfAst
+      .map(node => {
+        switch (node.type) {
+          case 'text':
+            if (node.value === '') {
+              return null;
+            } else {
+              return `'${node.value.replace(/'/, '\\\'')}'`;
+            }
+          case 'variable':
+            context.params.add(node.name);
+            return node.name;
+          default: throw new Error(`Unknown AST node type "${node.type}"`);
+        }
+      })
+      .filter(part => part)
+      .join('+');
+    return `{${attributeValueExpression}}`;
+  }
+}
+
+function sprintfToJsxFragment (sprintfStr, context, keyBase) {
+  return parseSprintf(sprintfStr)
+    .map((node, i) => {
+      switch (node.type) {
+        case 'text': return `'${jsStringEscape(node.value)}'`;
+        case 'variable':
+          context.params.add(node.name);
+          const key = `${keyBase}-${i}`;
+          return `ensureKey(${node.name},'${key}')`;
+        default: throw new Error(`Unknown AST node type "${node.type}"`);
+      }
+    });
 }
 
 function ensureToplevelTag (ast) {
@@ -55,36 +95,10 @@ function serializeAttributeNameToJsx (name, context) {
   return name === 'class' ? 'className' : name;
 }
 
-function serializeAttributeValueToJsx (value, context) {
-  const sprintfAst = parseSprintf(value);
-  if (sprintfAst.length === 1 && sprintfAst[0].type === 'text') {
-    return `"${sprintfAst[0].value}"`;
-  } else {
-    const attributeValueExpression = sprintfAst
-      .map(node => {
-        switch (node.type) {
-          case 'text':
-            if (node.value === '') {
-              return null;
-            } else {
-              return `'${node.value.replace(/'/, '\\\'')}'`;
-            }
-          case 'variable':
-            context.params.add(node.name);
-            return node.name;
-          default: throw new Error(`Unknown AST node type "${node.type}"`);
-        }
-      })
-      .filter(part => part)
-      .join('+');
-    return `{${attributeValueExpression}}`;
-  }
-}
-
 function serializeAttributeToJsx ({ name, value }, context) {
   return [
     serializeAttributeNameToJsx(name, context),
-    serializeAttributeValueToJsx(value, context)
+    sprintfToJsxAttributeValue(value, context)
   ].join('=');
 }
 
@@ -121,8 +135,8 @@ function serializeNodeToJsx (node, context, key = null) {
       ].join('');
     }
   } else if (treeAdapter.isTextNode(node)) {
-    const textContent = treeAdapter.getTextNodeContent(node);
-    return serializeTextContentToJsx(textContent, context);
+    const sprintfStr = treeAdapter.getTextNodeContent(node);
+    return sprintfToJsxTextNode(sprintfStr, context);
   } else {
     return null;
   }
@@ -130,17 +144,7 @@ function serializeNodeToJsx (node, context, key = null) {
 
 function serializeTextFragment (node, context, keyBase) {
   const textContent = treeAdapter.getTextNodeContent(node);
-  return parseSprintf(textContent)
-    .map((node, i) => {
-      switch (node.type) {
-        case 'text': return `'${jsStringEscape(node.value)}'`;
-        case 'variable':
-          context.params.add(node.name);
-          const key = `${keyBase}-${i}`;
-          return `ensureKey(${node.name},'${key}')`;
-        default: throw new Error(`Unknown AST node type "${node.type}"`);
-      }
-    });
+  return sprintfToJsxFragment(textContent, context, keyBase);
 }
 
 function jsxBodyFromFragments (fragments) {
@@ -153,20 +157,25 @@ function jsxBodyFromFragments (fragments) {
   }
 }
 
+function flatten (arrayOfArrays) {
+  return [].concat(...arrayOfArrays);
+}
+
 function serializeToJsx (ast) {
   const context = {
     params: new Set()
   };
-  const fragmentValues = treeAdapter.getChildNodes(ast)
+  const fragmentValues = flatten(treeAdapter.getChildNodes(ast)
     .filter(node => !treeAdapter.isCommentNode(node))
-    .reduce((fragmentValues, node, i, childNodes) => {
+    .map((node, i, childNodes) => {
       if (treeAdapter.isTextNode(node)) {
-        return fragmentValues.concat(serializeTextFragment(node, context, String(i)));
+        return serializeTextFragment(node, context, String(i));
       } else {
         const key = childNodes.length > 1 ? String(i) : null;
-        return fragmentValues.concat([serializeNodeToJsx(node, context, key)]);
+        return serializeNodeToJsx(node, context, key);
       }
-    }, []);
+    }, []));
+
   const paramsDecl = context.params.size > 0 ? `{${Array.from(context.params).join(', ')}}` : '';
   const jsxBody = jsxBodyFromFragments(fragmentValues);
   return `(${paramsDecl}) => ${jsxBody}`;

@@ -26,20 +26,12 @@ module.exports = {
       {
         test: /\.json$/,
         include: path.resolve(__dirname, '../client/locales'),
-        use: [
-          { loader: 'babel-loader' },
-          {
-            loader: 'i18n',
-            options: {
-              prefix: 'I18n_'
-            }
-          }
-        ]
+        use: [ { loader: 'babel-loader' }, { loader: 'i18n' } ]
       }
     ]
   },
   plugins: [
-    // new UglifyJSPlugin(), enable for tree-shaking
+    // new UglifyJSPlugin(), // enable for tree-shaking
     HtmlWebpackPluginConfig
   ],
   resolveLoader: {
