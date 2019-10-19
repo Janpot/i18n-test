@@ -19,11 +19,11 @@
     "babel-preset-react": "^6.16.0",
     "html-webpack-plugin": "^2.26.0",
     "js-string-escape": "^1.0.1",
-    "nodemon": "^1.12.1",
+    "nodemon": "^1.19.4",
     "parse5": "^3.0.2",
     "semver": "^5.4.1",
     "uglifyjs-webpack-plugin": "beta",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.3.0"
+    "webpack-dev-server": "^2.11.5"
   }
 }
