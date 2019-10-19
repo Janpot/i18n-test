@@ -24,6 +24,6 @@
     "semver": "^5.4.1",
     "uglifyjs-webpack-plugin": "beta",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.11.5"
+    "webpack-dev-server": "^3.1.11"
   }
 }
