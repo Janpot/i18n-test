@@ -1,4 +1,4 @@
-# WooRank i18n experiment
+# i18n experiment
 
 Precompiles our messages format (sprintf) to react components.
 Uses webpack aliases to create multiple bundles, one for each locale.
